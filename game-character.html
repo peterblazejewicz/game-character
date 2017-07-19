@@ -4,8 +4,13 @@
     :host {
       display: block;
     }
+    ::slotted(pixels) {
+      display: none;
+    }
   </style>
   <h2>Hello World!!</h2>
+  <!-- a placeholder for your mario pixels -->
+  <slot></slot>
 </template>
 <script>
   const doc = (document.currentScript.ownerDocument || document.currentScript._ownerDocument);
@@ -17,6 +22,12 @@
     * @demo demo/index.html
     */
   class GameCharacter extends HTMLElement {
+    /**
+      * pattern matching for mario pixel art
+      */
+    static get pattern() {
+      return /\(([rwkotpbyng\s]+?)\)/ig
+    }
     static get is() { return 'game-character'; }
     static get template() {
       const tmpl = doc.querySelector("#game-character");
@@ -30,7 +41,11 @@
       this.attachShadow({mode: 'open'});
       this.shadowRoot.appendChild(GameCharacter.template);
     }
-    
+
+    connectedCallback() {
+      console.log(this.connectedCallback.name);
+    }
+
   }
   customElements.define(GameCharacter.is, GameCharacter);
 </script>
