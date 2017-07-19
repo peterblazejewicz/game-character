@@ -42,8 +42,20 @@
       this.shadowRoot.appendChild(GameCharacter.template);
     }
 
+    /**
+      * whenever comonent is attached to the dom
+      * scan content of pixels slot
+      * to retrieve pixel art definition added by user
+      */
     connectedCallback() {
-      console.log(this.connectedCallback.name);
+      const nodes = this.shadowRoot.querySelector('slot')
+        .assignedNodes({flatten: true});
+      const pixels = nodes
+        .filter(node => node.tagName === 'PIXELS')[0];
+      if(!pixels) {
+        console.warn('Cannot find pixel art definition!');
+        return;
+      }
     }
 
   }
