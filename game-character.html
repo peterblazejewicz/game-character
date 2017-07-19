@@ -22,12 +22,6 @@
     * @demo demo/index.html
     */
   class GameCharacter extends HTMLElement {
-    /**
-      * pattern matching for mario pixel art
-      */
-    static get pattern() {
-      return /\(([rwkotpbyng\s]+?)\)/ig
-    }
     static get is() { return 'game-character'; }
     static get template() {
       const tmpl = doc.querySelector("#game-character");
@@ -56,6 +50,16 @@
         console.warn('Cannot find pixel art definition!');
         return;
       }
+      const pixelArray = [];
+      const pixelData = pixels.textContent;
+      const pattern =  /\(([rwkotpbyng\s]+?)\)/gi;
+      // regex matching and data split
+      var match = pattern.exec(pixelData);
+      while(match !== null) {
+          pixelArray.push((match[1].split(' ')));
+          match = pattern.exec(pixelData);
+      }
+      
     }
 
   }
