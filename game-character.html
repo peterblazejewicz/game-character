@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<template id="game-character"> 
+  <style>
+    :host {
+      display: block;
+    }
+  </style>
+  <h2>Hello World!!</h2>
+</template>
+<script>
+  const doc = (document.currentScript.ownerDocument || document.currentScript._ownerDocument);
+  /**
+    * `game-character`
+    * A CSS game character
+    *
+    * @customElement
+    * @demo demo/index.html
+    */
+  class GameCharacter extends HTMLElement {
+    static get is() { return 'game-character'; }
+    static get template() {
+      const tmpl = doc.querySelector("#game-character");
+      return tmpl.content.cloneNode(true);
+    }
+    /**
+      * @constructor
+      */
+    constructor() {
+      super();
+      this.attachShadow({mode: 'open'});
+      this.shadowRoot.appendChild(GameCharacter.template);
+    }
+    
+  }
+  customElements.define(GameCharacter.is, GameCharacter);
+</script>
