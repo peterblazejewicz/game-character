@@ -51,6 +51,12 @@
         "g": "#5ac528"
       };
     }
+
+    /**
+    * Default size of the pixel art
+    */
+    static get DefaultPixelSize() { return 10; }
+
     /**
      * @constructor
      */
@@ -61,6 +67,7 @@
       });
       this.shadowRoot.appendChild(GameCharacter.template);
       this.colorMap = GameCharacter.DefaultColourMap;
+      this.pixelSize = GameCharacter.DefaultPixelSize;
     }
 
     /**
@@ -106,6 +113,25 @@
       if(Object.keys(colorMap).length) {
         this.colorMap = Object.assign({}, colorMap);
       }
+      this.pixelise(pixelArray);
+    }
+
+    /**
+    * @param {Array} pixels nested array with rows and cols of data
+    */
+    pixelise(pixels) {
+      let shadows = '';
+      pixels.forEach((row, rIndex) => {
+        let rowIndex = rIndex + 1;
+        row.forEach((col, cIndex) => {
+          let colIndex = cIndex + 1;
+          shadows += `${colIndex * this.pixelSize}px ${rowIndex * this.pixelSize}px ${this.colorMap[col]}`;
+          if(colIndex < row.length && rowIndex < pixels.length) {
+            shadows += ','
+          }
+        });
+      });
+      console.log(shadows);
     }
 
   }
