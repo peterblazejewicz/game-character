@@ -2,7 +2,20 @@
 <template id="game-character">
   <style>
     :host {
-      display: block;
+      display: inline-block;
+      position: relative;
+      width: calc(var(--character-pixel-rows) * var(--character-pixel-size));
+      height: calc(var(--character-pixel-columns) * var(--character-pixel-size));
+    }
+
+    :host::after {
+      content: '';
+      position: absolute;
+      top: calc(-1 * var(--character-pixel-size));
+      left: calc(-1 * var(--character-pixel-size));
+      width: var(--character-pixel-size);
+      height: var(--character-pixel-size);
+      box-shadow: var(--character-box-shadow);
     }
 
     ::slotted(pixels) {
@@ -13,7 +26,6 @@
       display: none;
     }
   </style>
-  <h2>Hello World!!</h2>
   <!-- a placeholder for your mario pixels -->
   <slot></slot>
 </template>
@@ -34,6 +46,12 @@
       const tmpl = doc.querySelector("#game-character");
       return tmpl.content.cloneNode(true);
     }
+    static get CustomProperties() { return {
+      characterPixelSize: '--character-pixel-size',
+      characterPixelRows: '--character-pixel-rows',
+      characterPixelColumns: '--character-pixel-columns',
+      characterBoxShadow: '--character-box-shadow'
+    }};
     /**
     * Default colour mapping hash
     */
@@ -68,6 +86,7 @@
       this.shadowRoot.appendChild(GameCharacter.template);
       this.colorMap = GameCharacter.DefaultColourMap;
       this.pixelSize = GameCharacter.DefaultPixelSize;
+      this.style.setProperty(GameCharacter.CustomProperties.characterPixelSize, `${this.pixelSize}px`);
     }
 
     /**
@@ -86,12 +105,6 @@
         console.warn('Cannot find pixel art definition!');
         return;
       }
-      const colors = nodes
-        .filter(node => node.tagName === 'COLORS')[0];
-      if (!colors) {
-        console.warn('Cannot find pixel art color map!');
-        return;
-      }
       // pixel map parser
       const pixelArray = [];
       const pixelData = pixels.textContent;
@@ -101,17 +114,24 @@
         pixelArray.push((match[1].split(' ')));
         match = pattern.exec(pixelData);
       }
-      // colour map parser
-      const colorMap = {};
-      const colorData = colors.textContent;
-      const colorPattern = /['"]*([a-z]){1}['"]*\s*:\s*(?:(#[0-9a-fA-F]+)|([a-zA-Z]+))/gi;
-      match = colorPattern.exec(colorData);
-      while (match !== null) {
-        colorMap[match[1]] = match[2] || match[3];
+      const colors = nodes
+        .filter(node => node.tagName === 'COLORS')[0];
+      if (colors) {
+        // colour map parser
+        const colorMap = {};
+        const colorData = colors.textContent;
+        const colorPattern = /['"]*([a-z]){1}['"]*\s*:\s*(?:(#[0-9a-fA-F]+)|([a-zA-Z]+))/gi;
         match = colorPattern.exec(colorData);
-      }
-      if(Object.keys(colorMap).length) {
-        this.colorMap = Object.assign({}, colorMap);
+        while (match !== null) {
+          colorMap[match[1]] = match[2] || match[3];
+          match = colorPattern.exec(colorData);
+        }
+        if(Object.keys(colorMap).length) {
+          this.colorMap = Object.assign({}, colorMap);
+        }
+      } else {
+        // default colour palette will be used
+        console.info('Cannot find pixel art color map! Default colour mapping will be used1');
       }
       this.pixelise(pixelArray);
     }
@@ -120,17 +140,19 @@
     * @param {Array} pixels nested array with rows and cols of data
     */
     pixelise(pixels) {
-      let shadows = '';
+      // use rows to update character height and width
+      this.style.setProperty(GameCharacter.CustomProperties.characterPixelRows, pixels[0].length);
+      this.style.setProperty(GameCharacter.CustomProperties.characterPixelColumns, pixels.length); 
+      let shadows = [];
       pixels.forEach((row, rIndex) => {
         let rowIndex = rIndex + 1;
         row.forEach((col, cIndex) => {
           let colIndex = cIndex + 1;
-          shadows += `${colIndex * this.pixelSize}px ${rowIndex * this.pixelSize}px ${this.colorMap[col]}`;
-          if(colIndex < row.length && rowIndex < pixels.length) {
-            shadows += ','
-          }
+          shadows.push(`${colIndex * this.pixelSize}px ${rowIndex * this.pixelSize}px ${this.colorMap[col]}`);
         });
       });
+      // use computed box shadow to actually render character
+      this.style.setProperty(GameCharacter.CustomProperties.characterBoxShadow, shadows.join(','));
     }
 
   }
