@@ -28,8 +28,25 @@
       return tmpl.content.cloneNode(true);
     }
     /**
-      * @constructor
-      */
+    * Default colour mapping hash
+    */
+    static get DefaultColourMap() {
+      return {
+        "r": "#f00",
+        "w": "#fff",
+        "k": "#000",
+        "o": "transparent",
+        "t": "#83401f",
+        "p": "#ffbc77",
+        "b": "#06f",
+        "y": "#ff0",
+        "n": "#ff8000",
+        "g": "#5ac528"
+      };
+    }
+    /**
+     * @constructor
+     */
     constructor() {
       super();
       this.attachShadow({mode: 'open'});
