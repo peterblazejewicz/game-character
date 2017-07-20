@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<template id="game-character"> 
+<template id="game-character">
   <style>
-    :host {
+     :host {
       display: block;
     }
-    ::slotted(pixels) {
+
+     ::slotted(pixels) {
       display: none;
     }
   </style>
@@ -15,14 +16,16 @@
 <script>
   const doc = (document.currentScript.ownerDocument || document.currentScript._ownerDocument);
   /**
-    * `game-character`
-    * A CSS game character
-    *
-    * @customElement
-    * @demo demo/index.html
-    */
+   * `game-character`
+   * A CSS game character
+   *
+   * @customElement
+   * @demo demo/index.html
+   */
   class GameCharacter extends HTMLElement {
-    static get is() { return 'game-character'; }
+    static get is() {
+      return 'game-character';
+    }
     static get template() {
       const tmpl = doc.querySelector("#game-character");
       return tmpl.content.cloneNode(true);
@@ -49,21 +52,25 @@
      */
     constructor() {
       super();
-      this.attachShadow({mode: 'open'});
+      this.attachShadow({
+        mode: 'open'
+      });
       this.shadowRoot.appendChild(GameCharacter.template);
     }
 
     /**
-      * whenever comonent is attached to the dom
-      * scan content of pixels slot
-      * to retrieve pixel art definition added by user
-      */
+     * whenever comonent is attached to the dom
+     * scan content of pixels slot
+     * to retrieve pixel art definition added by user
+     */
     connectedCallback() {
       const nodes = this.shadowRoot.querySelector('slot')
-        .assignedNodes({flatten: true});
+        .assignedNodes({
+          flatten: true
+        });
       const pixels = nodes
         .filter(node => node.tagName === 'PIXELS')[0];
-      if(!pixels) {
+      if (!pixels) {
         console.warn('Cannot find pixel art definition!');
         return;
       }
