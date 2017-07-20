@@ -56,6 +56,7 @@
         mode: 'open'
       });
       this.shadowRoot.appendChild(GameCharacter.template);
+      this.colorMap = GameCharacter.DefaultColourMap;
     }
 
     /**
@@ -74,16 +75,33 @@
         console.warn('Cannot find pixel art definition!');
         return;
       }
+      const colors = nodes
+        .filter(node => node.tagName === 'COLORS')[0];
+      if (!colors) {
+        console.warn('Cannot find pixel art color map!');
+        return;
+      }
+      // pixel map parser
       const pixelArray = [];
       const pixelData = pixels.textContent;
-      const pattern =  /\(([rwkotpbyng\s]+?)\)/gi;
-      // regex matching and data split
+      const pattern = /\(([rwkotpbyng\s]+?)\)/gi;
       var match = pattern.exec(pixelData);
-      while(match !== null) {
-          pixelArray.push((match[1].split(' ')));
-          match = pattern.exec(pixelData);
+      while (match !== null) {
+        pixelArray.push((match[1].split(' ')));
+        match = pattern.exec(pixelData);
       }
-      
+      // colour map parser
+      const colorMap = {};
+      const colorData = colors.textContent;
+      const colorPattern = /['"]*([a-z]){1}['"]*\s*:\s*(?:(#[0-9a-fA-F]+)|([a-zA-Z]+))/gi;
+      match = colorPattern.exec(colorData);
+      while (match !== null) {
+        colorMap[match[1]] = match[2] || match[3];
+        match = colorPattern.exec(colorData);
+      }
+      if(Object.keys(colorMap).length) {
+        this.colorMap = Object.assign({}, colorMap);
+      }
     }
 
   }
