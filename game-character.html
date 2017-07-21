@@ -86,7 +86,6 @@
       this.shadowRoot.appendChild(GameCharacter.template);
       this.colorMap = GameCharacter.DefaultColourMap;
       this.pixelSize = GameCharacter.DefaultPixelSize;
-      this.style.setProperty(GameCharacter.CustomProperties.characterPixelSize, `${this.pixelSize}px`);
     }
 
     /**
@@ -95,6 +94,7 @@
      * to retrieve pixel art definition added by user
      */
     connectedCallback() {
+      this.style.setProperty(GameCharacter.CustomProperties.characterPixelSize, `${this.pixelSize}px`);
       const nodes = this.shadowRoot.querySelector('slot')
         .assignedNodes({
           flatten: true
