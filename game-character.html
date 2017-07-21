@@ -42,6 +42,9 @@
     static get is() {
       return 'game-character';
     }
+    static get observedAttributes() {
+      return ['size'];
+    }
     static get template() {
       const tmpl = doc.querySelector("#game-character");
       return tmpl.content.cloneNode(true);
@@ -88,6 +91,14 @@
       this.pixelSize = GameCharacter.DefaultPixelSize;
     }
 
+    attributeChangedCallback(attr, oldValue, newValue) {
+      if(attr === 'size') {
+        this.pixelSize = newValue;
+        this.style.setProperty(GameCharacter.CustomProperties.characterPixelSize, `${this.pixelSize}px`);
+        this.renderCharacter();
+      }
+    }
+
     /**
      * whenever comonent is attached to the dom
      * scan content of pixels slot
@@ -95,15 +106,19 @@
      */
     connectedCallback() {
       this.style.setProperty(GameCharacter.CustomProperties.characterPixelSize, `${this.pixelSize}px`);
+      this.renderCharacter();
+    }
+
+    renderCharacter() {
       const nodes = this.shadowRoot.querySelector('slot')
-        .assignedNodes({
-          flatten: true
-        });
+      .assignedNodes({
+        flatten: true
+      });
       const pixels = nodes
-        .filter(node => node.tagName === 'PIXELS')[0];
+      .filter(node => node.tagName === 'PIXELS')[0];
       if (!pixels) {
-        console.warn('Cannot find pixel art definition!');
-        return;
+      console.warn('Cannot find pixel art definition!');
+      return;
       }
       // pixel map parser
       const pixelArray = [];
@@ -111,27 +126,27 @@
       const pattern = /\(([rwkotpbyng\s]+?)\)/gi;
       var match = pattern.exec(pixelData);
       while (match !== null) {
-        pixelArray.push((match[1].split(' ')));
-        match = pattern.exec(pixelData);
+      pixelArray.push((match[1].split(' ')));
+      match = pattern.exec(pixelData);
       }
       const colors = nodes
-        .filter(node => node.tagName === 'COLORS')[0];
+      .filter(node => node.tagName === 'COLORS')[0];
       if (colors) {
-        // colour map parser
-        const colorMap = {};
-        const colorData = colors.textContent;
-        const colorPattern = /['"]*([a-z]){1}['"]*\s*:\s*(?:(#[0-9a-fA-F]+)|([a-zA-Z]+))/gi;
+      // colour map parser
+      const colorMap = {};
+      const colorData = colors.textContent;
+      const colorPattern = /['"]*([a-z]){1}['"]*\s*:\s*(?:(#[0-9a-fA-F]+)|([a-zA-Z]+))/gi;
+      match = colorPattern.exec(colorData);
+      while (match !== null) {
+        colorMap[match[1]] = match[2] || match[3];
         match = colorPattern.exec(colorData);
-        while (match !== null) {
-          colorMap[match[1]] = match[2] || match[3];
-          match = colorPattern.exec(colorData);
-        }
-        if(Object.keys(colorMap).length) {
-          this.colorMap = Object.assign({}, colorMap);
-        }
+      }
+      if(Object.keys(colorMap).length) {
+        this.colorMap = Object.assign({}, colorMap);
+      }
       } else {
-        // default colour palette will be used
-        console.info('Cannot find pixel art color map! Default colour mapping will be used1');
+      // default colour palette will be used
+      console.info('Cannot find pixel art color map! Default colour mapping will be used1');
       }
       this.pixelise(pixelArray);
     }
